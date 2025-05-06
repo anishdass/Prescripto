@@ -42,12 +42,22 @@ const Navbar = () => {
               className=' w-2.5'
             />
             <div className='absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block'>
-              <div>
-                <p className='cursor-pointer hover:text-black'>My Profile</p>
-                <p className='cursor-pointer hover:text-black'>
+              <div className=' min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4'>
+                <p
+                  onClick={() => navigate("my-profile")}
+                  className='cursor-pointer hover:text-black'>
+                  My Profile
+                </p>
+                <p
+                  onClick={() => navigate("my-appointment")}
+                  className='cursor-pointer hover:text-black'>
                   My Appointment
                 </p>
-                <p className='cursor-pointer hover:text-black'>Logout</p>
+                <p
+                  onClick={() => setToken(false)}
+                  className='cursor-pointer hover:text-black'>
+                  Logout
+                </p>
               </div>
             </div>
           </div>
