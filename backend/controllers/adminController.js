@@ -5,6 +5,7 @@ import doctorModel from "../models/doctorModel.js";
 
 // API for adding doctor
 const addDoctor = async (req, res) => {
+  console.log(req);
   try {
     const {
       name,
@@ -73,7 +74,7 @@ const addDoctor = async (req, res) => {
       date: Date.now(),
     };
 
-    const newDoctor = new doctorModel(doctor);
+    const newDoctor = new doctorModel(doctorData);
     await newDoctor.save();
 
     res.json({ success: true, message: "Doctor Added" });
