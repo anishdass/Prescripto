@@ -5,7 +5,6 @@ import doctorModel from "../models/doctorModel.js";
 
 // API for adding doctor
 const addDoctor = async (req, res) => {
-  console.log(req);
   try {
     const {
       name,
@@ -79,7 +78,6 @@ const addDoctor = async (req, res) => {
 
     res.json({ success: true, message: "Doctor Added" });
   } catch (error) {
-    console.log(error);
     res.json({ success: false, message: error.message });
   }
 };
