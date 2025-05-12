@@ -6,7 +6,8 @@
 }
 
 :root {
-  --primary: #5f6fff;
+  /* --primary: #5f6fff; */
+  --primary: #00bcd4;
 }
 
 @layer utilities {
