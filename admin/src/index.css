@@ -1,8 +1,13 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit&display=swap");
 @import "tailwindcss";
 
 :root {
   /* --primary: #5f6fff; */
   --primary: #00bcd4;
+}
+
+* {
+  font-family: "Outfit", sans-serif;
 }
 
 @layer utilities {

@@ -49,10 +49,24 @@ const AddDoctor = () => {
       );
       if (data.success) {
         toast.success(data.message);
+        setDocImg(false);
+        setName("");
+        setPassword("");
+        setEmail("");
+        setExperience("1 Year");
+        setSpeciality("General physician");
+        setAddress1("");
+        setAddress2("");
+        setAbout("");
+        setDegree("");
+        setFees("");
       } else {
         toast.error(data.message);
       }
-    } catch (error) {}
+    } catch (error) {
+      toast.error(error.message);
+      console.log(error);
+    }
   };
 
   return (
@@ -119,8 +133,8 @@ const AddDoctor = () => {
                 onChange={(e) => setExperience(e.target.value)}
                 value={experience}
                 className=' border rounded px-3 py-2'
-                name=''
-                id=''>
+                name='experience'
+                id='experience'>
                 <option value='1 Year'>1 Year</option>
                 <option value='2 Years'>2 Years</option>
                 <option value='3 Years'>3 Years</option>
@@ -153,8 +167,8 @@ const AddDoctor = () => {
                 onChange={(e) => setSpeciality(e.target.value)}
                 value={speciality}
                 className=' border rounded px-3 py-2'
-                name=''
-                id=''>
+                name='speciality'
+                id='speciality'>
                 <option value='General physician'>General physician</option>
                 <option value='Gynecologist'>Gynecologist</option>
                 <option value='Dermatologist'>Dermatologist</option>
