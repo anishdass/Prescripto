@@ -1,7 +1,8 @@
-import React from "react";
+import express from "express";
+import { doctorList } from "../controllers/doctorController.js";
 
-const doctorRoute = () => {
-  return <div>doctorRoute</div>;
-};
+const doctorRouter = express.Router();
 
-export default doctorRoute;
+doctorRouter.get("/list", doctorList);
+
+export default doctorRouter;
