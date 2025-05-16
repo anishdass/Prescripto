@@ -4,8 +4,8 @@ import userModel from "../models/userModel.js";
 import jwt from "jsonwebtoken";
 import { v2 as cloudinary } from "cloudinary";
 import doctorModel from "../models/doctorModel.js";
-
 import appointmentModel from "../models/appointmentModel.js";
+import Stripe from "stripe";
 
 // Api to register user
 
@@ -189,7 +189,7 @@ const cancelAppointment = async (req, res) => {
     const { userId, appointmentId } = req.body;
     const appointmentData = await appointmentModel.findById(appointmentId);
     if (appointmentData.userId !== userId) {
-      return res.json({ succes: false, message: "Unauthorized action" });
+      return res.json({ success: false, message: "Unauthorized action" });
     } else {
       await appointmentModel.findByIdAndUpdate(appointmentId, {
         cancelled: true,
@@ -203,12 +203,43 @@ const cancelAppointment = async (req, res) => {
       (e) => e !== slotTime
     );
     await doctorModel.findByIdAndUpdate(docId, { slots_booked });
-    res.json({ succes: true, message: "Appointment cancelled" });
+    res.json({ success: true, message: "Appointment cancelled" });
   } catch (error) {
     console.error(error);
     res.json({ success: false, message: error.message });
   }
 };
+
+const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+// API to make appointment payment using RazorPay
+const paymentStripe = async (req, res) => {
+  try {
+    const { appointmentId } = req.body;
+    const appointmentData = await appointmentModel.findById(appointmentId);
+
+    if (!appointmentData || appointmentData.cancelAppointment) {
+      return (
+        res,
+        json({ success: false, message: "Appointment cancelled or not found" })
+      );
+    }
+    // Creating options for Stripe payments
+    const options = {
+      amount: appointmentData.amount * 100,
+      currency: process.env.CURRENCY,
+      metadata: { appointmentId },
+    };
+
+    // Creation of an order
+    const order = await stripeInstance.paymentIntents.create(options);
+    res.json({ success: true, order });
+  } catch (error) {
+    console.error(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
 export {
   registerUser,
   loginUser,
@@ -217,4 +248,5 @@ export {
   bookAppointment,
   listAppointment,
   cancelAppointment,
+  paymentStripe,
 };

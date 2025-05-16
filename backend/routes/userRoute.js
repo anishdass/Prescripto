@@ -5,6 +5,7 @@ import {
   getProfile,
   listAppointment,
   loginUser,
+  paymentStripe,
   registerUser,
   updateProfile,
 } from "../controllers/userController.js";
@@ -19,6 +20,7 @@ userRouter.post("/get-profile", authUser, getProfile);
 userRouter.post("/book-appointment", authUser, bookAppointment);
 userRouter.get("/appointments", authUser, listAppointment);
 userRouter.post("/cancel-appointment", authUser, cancelAppointment);
+userRouter.post("/payment-stripe", authUser, paymentStripe);
 userRouter.post(
   "/update-profile",
   upload.single("image"),
