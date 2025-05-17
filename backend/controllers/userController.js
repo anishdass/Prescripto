@@ -210,32 +210,35 @@ const cancelAppointment = async (req, res) => {
   }
 };
 
-const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // API to make appointment payment using RazorPay
 const paymentStripe = async (req, res) => {
   try {
-    const { appointmentId } = req.body;
-    const appointmentData = await appointmentModel.findById(appointmentId);
+    const { amount } = req.body;
 
-    if (!appointmentData || appointmentData.cancelAppointment) {
-      return (
-        res,
-        json({ success: false, message: "Appointment cancelled or not found" })
-      );
-    }
-    // Creating options for Stripe payments
-    const options = {
-      amount: appointmentData.amount * 100,
-      currency: process.env.CURRENCY,
-      metadata: { appointmentId },
-    };
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+      line_items: [
+        {
+          price_data: {
+            currency: process.env.CURRENCY,
+            product_data: {
+              name: "Product Name",
+            },
+            unit_amount: amount * 100, // £9.99
+          },
+          quantity: 1,
+        },
+      ],
+      success_url: "http://localhost:3000/success",
+      cancel_url: "http://localhost:3000/cancel",
+    });
 
-    // Creation of an order
-    const order = await stripeInstance.paymentIntents.create(options);
-    res.json({ success: true, order });
+    res.json({ success: true, url: session.url });
   } catch (error) {
-    console.error(error);
+    console.error(error.message);
     res.json({ success: false, message: error.message });
   }
 };

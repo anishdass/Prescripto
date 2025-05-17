@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { loadStripe } from "@stripe/stripe-js";
 
 const MyAppointments = () => {
   const { backendUrl, token, getDoctorsData } = useContext(AppContext);
@@ -54,7 +55,6 @@ const MyAppointments = () => {
         { appointmentId },
         { headers: { token } }
       );
-      console.log(data);
       if (data.success) {
         toast.success(data.message);
         getUsersAppointment();
@@ -68,20 +68,22 @@ const MyAppointments = () => {
     }
   };
 
-  const appointmentStripe = async (appointmentId) => {
-    try {
-      const { data } = await axios.post(
-        backendUrl + "/api/user/payment-stripe",
-        { appointmentId },
-        { headers: { token } }
-      );
-      if (data.success) {
-        console.log(data.order);
+  // const stripePromise = loadStripe("pk_test_your_public_key_here");
+
+  const makePayment = async (appointment) => {
+    const stripe = await loadStripe(
+      import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
+    );
+
+    const { data } = await axios.post(
+      backendUrl + "/api/user/payment-stripe",
+      { amount: appointment.amount },
+      {
+        headers: { token },
       }
-    } catch (error) {
-      console.log(error);
-      toast.error(error.message);
-    }
+    );
+
+    // window.location.href = data.url;
   };
 
   useEffect(() => {
@@ -126,7 +128,7 @@ const MyAppointments = () => {
             <div className=' flex flex-col gap-2 justify-end'>
               {!appointment.cancelled && (
                 <button
-                  onClick={() => appointmentStripe(appointment._id)}
+                  onClick={() => makePayment(appointment)}
                   className=' text-sm text-stone-500 text-center sm:min-w-40 py-2 border rounded hover:bg-[#5f6fff] hover:text-white transition-all duration-300'>
                   Pay Online
                 </button>
