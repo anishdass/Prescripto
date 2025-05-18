@@ -216,7 +216,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const paymentStripe = async (req, res) => {
   try {
     const { amount } = req.body;
-
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
@@ -225,9 +224,9 @@ const paymentStripe = async (req, res) => {
           price_data: {
             currency: process.env.CURRENCY,
             product_data: {
-              name: "Product Name",
+              name: "Appointment",
             },
-            unit_amount: amount * 100, // £9.99
+            unit_amount: amount * 100,
           },
           quantity: 1,
         },
@@ -236,7 +235,9 @@ const paymentStripe = async (req, res) => {
       cancel_url: "http://localhost:3000/cancel",
     });
 
-    res.json({ success: true, url: session.url });
+    console.log(session);
+
+    res.json({ success: true, session: session });
   } catch (error) {
     console.error(error.message);
     res.json({ success: false, message: error.message });

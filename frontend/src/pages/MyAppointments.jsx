@@ -2,7 +2,6 @@ import React, { useContext, useState, useEffect } from "react";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { loadStripe } from "@stripe/stripe-js";
 
 const MyAppointments = () => {
   const { backendUrl, token, getDoctorsData } = useContext(AppContext);
@@ -68,13 +67,8 @@ const MyAppointments = () => {
     }
   };
 
-  // const stripePromise = loadStripe("pk_test_your_public_key_here");
-
   const makePayment = async (appointment) => {
-    const stripe = await loadStripe(
-      import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
-    );
-
+    console.log(appointment);
     const { data } = await axios.post(
       backendUrl + "/api/user/payment-stripe",
       { amount: appointment.amount },
@@ -82,8 +76,9 @@ const MyAppointments = () => {
         headers: { token },
       }
     );
+    console.log(data.session);
 
-    // window.location.href = data.url;
+    // window.location.href = data.session.url;
   };
 
   useEffect(() => {
