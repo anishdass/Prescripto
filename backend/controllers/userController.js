@@ -190,11 +190,11 @@ const cancelAppointment = async (req, res) => {
     const appointmentData = await appointmentModel.findById(appointmentId);
     if (appointmentData.userId !== userId) {
       return res.json({ success: false, message: "Unauthorized action" });
-    } else {
-      await appointmentModel.findByIdAndUpdate(appointmentId, {
-        cancelled: true,
-      });
     }
+    await appointmentModel.findByIdAndUpdate(appointmentId, {
+      cancelled: true,
+    });
+
     // Releasing Doctor slot
     const { docId, slotDate, slotTime } = appointmentData;
     const docData = await doctorModel.findById(docId);
@@ -210,23 +210,23 @@ const cancelAppointment = async (req, res) => {
   }
 };
 
+// Creating Stripe instance
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // API to make appointment payment using RazorPay
 const paymentStripe = async (req, res) => {
   try {
-    const { amount } = req.body;
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
       line_items: [
         {
           price_data: {
-            currency: process.env.CURRENCY,
+            currency: "gbp",
             product_data: {
-              name: "Appointment",
+              name: "Product Name",
             },
-            unit_amount: amount * 100,
+            unit_amount: 999, // £9.99
           },
           quantity: 1,
         },
@@ -235,9 +235,7 @@ const paymentStripe = async (req, res) => {
       cancel_url: "http://localhost:3000/cancel",
     });
 
-    console.log(session);
-
-    res.json({ success: true, session: session });
+    res.json({ success: true, session });
   } catch (error) {
     console.error(error.message);
     res.json({ success: false, message: error.message });

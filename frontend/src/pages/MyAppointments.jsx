@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { loadStripe } from "@stripe/stripe-js";
 
 const MyAppointments = () => {
   const { backendUrl, token, getDoctorsData } = useContext(AppContext);
@@ -29,6 +30,17 @@ const MyAppointments = () => {
       dateArray[0] + " " + months[Number(dateArray[1])] + " " + dateArray[2]
     );
   };
+
+  function convertTo12Hour(time24) {
+    // time24 should be in "HH:mm" format
+    const [hourStr, minute] = time24.split(":");
+    let hour = parseInt(hourStr, 10);
+
+    const ampm = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12; // Convert 0 to 12 and 13-23 to 1-11
+
+    return `${hour}:${minute} ${ampm}`;
+  }
 
   const getUsersAppointment = async () => {
     try {
@@ -67,18 +79,26 @@ const MyAppointments = () => {
     }
   };
 
+  const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+
   const makePayment = async (appointment) => {
-    console.log(appointment);
+    const stripe = await loadStripe(
+      import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
+    );
     const { data } = await axios.post(
       backendUrl + "/api/user/payment-stripe",
-      { amount: appointment.amount },
+      {
+        amount: appointment.amount,
+        name: appointment.docData.name,
+        date: slotDateFormat(appointment.slotDate),
+        time: appointment.slotTime,
+      },
       {
         headers: { token },
       }
     );
-    console.log(data.session);
 
-    // window.location.href = data.session.url;
+    window.location.href = data.session.url;
   };
 
   useEffect(() => {
@@ -116,7 +136,8 @@ const MyAppointments = () => {
                 <span className=' text-sm text-neutral-700 font-medium'>
                   Date & Time:
                 </span>{" "}
-                {slotDateFormat(appointment.slotDate)} | {appointment.slotTime}
+                {slotDateFormat(appointment.slotDate)} |{" "}
+                {convertTo12Hour(appointment.slotTime)}
               </p>
             </div>
             <div></div>
