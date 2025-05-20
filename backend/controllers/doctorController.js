@@ -67,8 +67,8 @@ const appointmentsDoctor = async (req, res) => {
 const appointmentComplete = async (req, res) => {
   try {
     const { docId, appointmentId } = req.body;
-    const appointmendData = await appointmentModel.findById(appointmentId);
-    if (appointmendData && appointmendData.docId == docId) {
+    const appointmentData = await appointmentModel.findById(appointmentId);
+    if (appointmentData && appointmentData.docId == docId) {
       await appointmentModel.findByIdAndUpdate(appointmentId, {
         isCompleted: true,
       });
@@ -89,8 +89,8 @@ const appointmentComplete = async (req, res) => {
 const appointmentCancel = async (req, res) => {
   try {
     const { docId, appointmentId } = req.body;
-    const appointmendData = await appointmentModel.findById(appointmentId);
-    if (appointmendData && appointmendData.docId == docId) {
+    const appointmentData = await appointmentModel.findById(appointmentId);
+    if (appointmentData && appointmentData.docId == docId) {
       await appointmentModel.findByIdAndUpdate(appointmentId, {
         cancelled: true,
       });
@@ -107,6 +107,39 @@ const appointmentCancel = async (req, res) => {
   }
 };
 
+// API to get Dashboard data by doctor
+const doctorDashboard = async (req, res) => {
+  try {
+    const { docId } = req.body;
+    const appointments = await appointmentModel.find({ docId });
+    let earnings = 0;
+
+    appointments.map((appointment) => {
+      if (appointment.isCompleted || appointment.payment) {
+        earnings += appointment.amount;
+      }
+    });
+    let patients = [];
+
+    appointments.forEach((appointment) => {
+      if (!patients.includes(appointment.userId)) {
+        patients.push(appointment.userId);
+      }
+    });
+
+    const dashData = {
+      earnings,
+      appointments: appointments.length,
+      patients: patients.length,
+      latestAppointments: appointments.reverse().slice(0, 5),
+    };
+    res.json({ success: true, dashData });
+  } catch (error) {
+    console.error(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
 export {
   changeAvailability,
   doctorList,
@@ -114,4 +147,5 @@ export {
   appointmentsDoctor,
   appointmentComplete,
   appointmentCancel,
+  doctorDashboard,
 };
