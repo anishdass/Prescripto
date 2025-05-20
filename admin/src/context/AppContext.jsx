@@ -33,19 +33,19 @@ const AppContextProvider = (props) => {
     );
   };
 
-  function convertTo12Hour(time24) {
-    const [hourStr, minute] = time24.split(":");
+  const slotTimeFormat = (slotTime) => {
+    const [hourStr, minute] = slotTime.split(":");
     let hour = parseInt(hourStr, 10);
 
     const ampm = hour >= 12 ? "PM" : "AM";
     hour = hour % 12 || 12;
 
     return `${hour}:${minute} ${ampm}`;
-  }
+  };
 
   const currency = "$";
 
-  const value = { calculateAge, slotDateFormat, convertTo12Hour, currency };
+  const value = { calculateAge, slotDateFormat, slotTimeFormat, currency };
 
   return (
     <AppContext.Provider value={value}>{props.children}</AppContext.Provider>

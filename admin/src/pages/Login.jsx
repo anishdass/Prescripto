@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { AdminContext } from "../context/AdminContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { DoctorContext } from "../context/DoctorContext";
 
 const Login = () => {
   const [state, setState] = useState("Admin");
@@ -9,6 +10,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
 
   const { setAtoken, backendUrl } = useContext(AdminContext);
+  const { setDtoken } = useContext(DoctorContext);
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
@@ -24,8 +26,22 @@ const Login = () => {
         } else {
           toast.error(data.message);
         }
+      } else {
+        const { data } = await axios.post(backendUrl + "/api/doctor/login", {
+          email,
+          password,
+        });
+        if (data.success) {
+          localStorage.setItem("dtoken", data.token);
+          setDtoken(data.token);
+        } else {
+          toast.error(data.message);
+        }
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -65,7 +81,11 @@ const Login = () => {
               Doctor Login?{" "}
               <span
                 className=' text-primary underline cursor-pointer'
-                onClick={() => setState("Doctor")}>
+                onClick={() => {
+                  setState("Doctor");
+                  setEmail("");
+                  setPassword("");
+                }}>
                 Click here
               </span>
             </p>
@@ -74,7 +94,11 @@ const Login = () => {
               Admin Login?{" "}
               <span
                 className=' text-primary underline cursor-pointer'
-                onClick={() => setState("Admin")}>
+                onClick={() => {
+                  setState("Admin");
+                  setEmail("");
+                  setPassword("");
+                }}>
                 Click here
               </span>
             </p>
