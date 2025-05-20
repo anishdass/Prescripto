@@ -8,7 +8,6 @@ import { AppContext } from "../../context/AppContext";
 const DoctorDashboard = () => {
   const {
     dashData,
-    setDashData,
     getDashData,
     dtoken,
     cancelAppointment,
