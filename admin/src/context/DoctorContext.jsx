@@ -22,7 +22,44 @@ const DoctorContextProvider = (props) => {
       );
       console.log(data);
       if (data.success) {
-        setAppointments(data.appointments.reverse());
+        setAppointments(data.appointments);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  };
+
+  const completeAppointment = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/doctor/complete-appointment",
+        { appointmentId },
+        { headers: { dtoken } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        getAppointments();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  };
+  const cancelAppointment = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/doctor/cancel-appointment",
+        { appointmentId },
+        { headers: { dtoken } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        getAppointments();
       } else {
         toast.error(data.message);
       }
@@ -39,6 +76,8 @@ const DoctorContextProvider = (props) => {
     appointments,
     setAppointments,
     getAppointments,
+    completeAppointment,
+    cancelAppointment,
   };
 
   return (

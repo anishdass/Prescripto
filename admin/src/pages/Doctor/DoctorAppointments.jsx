@@ -6,7 +6,13 @@ import { AppContext } from "../../context/AppContext";
 import { assets } from "../../assets/assets_admin/assets";
 
 const DoctorAppointments = () => {
-  const { dtoken, appointments, getAppointments } = useContext(DoctorContext);
+  const {
+    dtoken,
+    appointments,
+    getAppointments,
+    completeAppointment,
+    cancelAppointment,
+  } = useContext(DoctorContext);
   const { calculateAge, slotDateFormat, slotTimeFormat, currency } =
     useContext(AppContext);
 
@@ -29,7 +35,7 @@ const DoctorAppointments = () => {
           <p>Fees</p>
           <p>Action</p>
         </div>
-        {appointments.map((appointment, index) => (
+        {appointments.reverse().map((appointment, index) => (
           <div
             className='flex flex-wrap justify-between max-sm:gap-5 max-sm:text-base sm:grid grid-cols-[0.5fr_2fr_1fr_1fr_3fr_1fr_1fr_] gap-1 items-center text-gray-500 py-3 px-6 border-b hover:bg-gray-50'
             key={index}>
@@ -58,18 +64,26 @@ const DoctorAppointments = () => {
               {currency}
               {appointment.amount}
             </p>
-            <div className=' flex'>
-              <img
-                className=' w-10 cursor-pointer'
-                src={assets.cancel_icon}
-                alt='accept-icon'
-              />
-              <img
-                className=' w-10 cursor-pointer'
-                src={assets.tick_icon}
-                alt='decline-icon'
-              />
-            </div>
+            {appointment.cancelled ? (
+              <p className=' text-red-400 text-xs font-medium'>Cancelled</p>
+            ) : appointment.isCompleted ? (
+              <p className=' text-green-500 text-xs font-medium'>Completed</p>
+            ) : (
+              <div className=' flex'>
+                <img
+                  onClick={() => cancelAppointment(appointment._id)}
+                  className=' w-10 cursor-pointer'
+                  src={assets.cancel_icon}
+                  alt='accept-icon'
+                />
+                <img
+                  onClick={() => completeAppointment(appointment._id)}
+                  className=' w-10 cursor-pointer'
+                  src={assets.tick_icon}
+                  alt='decline-icon'
+                />
+              </div>
+            )}
           </div>
         ))}
       </div>
