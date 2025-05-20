@@ -94,7 +94,6 @@ const DoctorContextProvider = (props) => {
       });
       if (data.success) {
         setProfileData(data.profileData);
-        console.log(data.profileData);
       }
     } catch (error) {
       console.log(error);
@@ -111,9 +110,9 @@ const DoctorContextProvider = (props) => {
     completeAppointment,
     cancelAppointment,
     dashData,
+    dtoken,
     setDashData,
     getDashData,
-    dtoken,
     profileData,
     setProfileData,
     getProfileData,

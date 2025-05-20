@@ -4,17 +4,44 @@ import { DoctorContext } from "../../context/DoctorContext";
 import { AppContext } from "../../context/AppContext";
 import { useEffect } from "react";
 import { useState } from "react";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const DoctorProfile = () => {
-  const { dtoken, profileData, setProfileData, getProfileData } =
+  const { dtoken, profileData, backendUrl, setProfileData, getProfileData } =
     useContext(DoctorContext);
-  const { currency, backendUrl } = useContext(AppContext);
+  const { currency } = useContext(AppContext);
   const [isEdit, setIsEdit] = useState(false);
+
   useEffect(() => {
     if (dtoken) {
       getProfileData();
     }
   }, [dtoken]);
+
+  const updateProfileData = async () => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/doctor/update-profile",
+        {
+          address: profileData.address,
+          fees: profileData.fees,
+          available: profileData.available,
+        },
+        { headers: { dtoken } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        setIsEdit(false);
+        getProfileData();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+      console.log(error);
+    }
+  };
 
   return (
     profileData && (
@@ -72,14 +99,14 @@ const DoctorProfile = () => {
               <p className=' text-sm'>
                 {isEdit ? (
                   <input
-                    type='number'
+                    type='text'
+                    value={profileData.address.line1}
                     onChange={(e) =>
                       setProfileData((prev) => ({
                         ...prev,
                         address: { ...prev.address, line1: e.target.value },
                       }))
                     }
-                    value={profileData.address.line1}
                   />
                 ) : (
                   profileData.address.line1
@@ -87,7 +114,7 @@ const DoctorProfile = () => {
                 <br />
                 {isEdit ? (
                   <input
-                    type='number'
+                    type='text'
                     onChange={(e) =>
                       setProfileData((prev) => ({
                         ...prev,
@@ -104,7 +131,6 @@ const DoctorProfile = () => {
             <div className=' flex gap-1 pt-2'>
               <input
                 onChange={() =>
-                  isEdit &&
                   setProfileData((prev) => ({
                     ...prev,
                     available: !prev.available,
@@ -117,15 +143,15 @@ const DoctorProfile = () => {
             </div>
             {isEdit ? (
               <button
-                onClick={() => setIsEdit(true)}
+                onClick={updateProfileData}
                 className=' px-4 py-1 border border-primary text-sm rounded-full mt-5 hover:bg-[#00bcd4] hover:text-white transition-all cursor-pointer'>
-                Edit
+                Save
               </button>
             ) : (
               <button
-                onClick={() => setIsEdit(false)}
+                onClick={() => setIsEdit(true)}
                 className=' px-4 py-1 border border-primary text-sm rounded-full mt-5 hover:bg-[#00bcd4] hover:text-white transition-all cursor-pointer'>
-                Save
+                Edit
               </button>
             )}
           </div>
