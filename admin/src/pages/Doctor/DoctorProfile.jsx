@@ -131,6 +131,7 @@ const DoctorProfile = () => {
             <div className=' flex gap-1 pt-2'>
               <input
                 onChange={() =>
+                  isEdit &&
                   setProfileData((prev) => ({
                     ...prev,
                     available: !prev.available,

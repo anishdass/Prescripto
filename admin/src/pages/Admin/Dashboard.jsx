@@ -92,6 +92,10 @@ const Dashboard = () => {
                 </div>
                 {appointment.cancelled ? (
                   <p className=' text-red-400 text-xs font-medium'>Cancelled</p>
+                ) : appointment.isCompleted ? (
+                  <p className=' text-green-500 text-xs font-medium'>
+                    Completed
+                  </p>
                 ) : (
                   <img
                     onClick={() => cancelAppointment(appointment._id)}

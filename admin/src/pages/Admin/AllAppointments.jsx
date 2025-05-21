@@ -8,7 +8,7 @@ import { assets } from "../../assets/assets_admin/assets";
 const AllAppointments = () => {
   const { atoken, appointments, getAllAppointments, cancelAppointment } =
     useContext(AdminContext);
-  const { calculateAge, slotDateFormat, convertTo12Hour, currency } =
+  const { calculateAge, slotDateFormat, slotTimeFormat, currency } =
     useContext(AppContext);
 
   useEffect(() => {
@@ -48,7 +48,7 @@ const AllAppointments = () => {
             </p>
             <p>
               {slotDateFormat(appointment.slotDate)},{" "}
-              {convertTo12Hour(appointment.slotTime)}
+              {slotTimeFormat(appointment.slotTime)}
             </p>
             <div className=' flex items-center gap-2'>
               <img
@@ -64,6 +64,8 @@ const AllAppointments = () => {
             </p>
             {appointment.cancelled ? (
               <p className=' text-red-400 text-xs font-medium'>Cancelled</p>
+            ) : appointment.isCompleted ? (
+              <p className=' text-green-500 text-xs font-medium'>Completed</p>
             ) : (
               <img
                 onClick={() => cancelAppointment(appointment._id)}
